@@ -1,7 +1,7 @@
 import pytest
 import numpy as np
 import copy
-from azul_ai_env.azul_env import AzulEnv
+from azul_marl_env.azul_env import AzulEnv
 from gymnasium import spaces
 
 
