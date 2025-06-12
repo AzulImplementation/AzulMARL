@@ -39,3 +39,4 @@ __pycache__/
 
 ### Other ###
 azul_ai_env.egg-info/
+.coverage

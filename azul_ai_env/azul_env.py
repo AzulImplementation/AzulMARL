@@ -138,8 +138,7 @@ class AzulEnv(AECEnv):
     def observe(self, agent):
         return self.state
 
-    def render(self):
-        print(self.state)
+    def render(self): # pragma: no cover
         if self.state is None:
             return
             
@@ -152,7 +151,7 @@ class AzulEnv(AECEnv):
         # Use the new renderer
         self.renderer.render(self.state, bag_counts, lid_counts, center_counts, factories)
 
-    def close(self):
+    def close(self): # pragma: no cover
         self.renderer.close()
 
     @staticmethod
