@@ -87,6 +87,73 @@ class AzulEnv(AECEnv):
         self.infos[self.agent_selection] = {"valid_moves": valid_moves}
         
         return self.state, {"valid_moves": valid_moves}
+    
+    def step(self, action):
+        factory_index, tile_to_take_number, tiles_to_place_floor, pattern_line_index = action
+        tile_to_take = Tile(self.__number_to_tile__(tile_to_take_number))
+
+        # Get valid moves for current player
+        valid_moves = self._get_all_valid_moves()
+        
+        # Check if the action is valid
+        if not self._is_valid_move(action):
+            reward = -2
+            self._cumulative_rewards[self.agent_selection] += reward
+            self.infos[self.agent_selection] = {"valid_moves": valid_moves}
+            return self.state, reward, False, False, {"valid_moves": valid_moves}
+
+        if factory_index == 0:
+            self.game.execute_factory_offer_phase_with_center(
+                tile_to_take, tiles_to_place_floor, pattern_line_index
+            )
+        else:
+            self.game.execute_factory_offer_phase_with_factory(
+                factory_index - 1, tile_to_take, tiles_to_place_floor, pattern_line_index
+            )
+
+        self._set_state()
+        self.agent_selection = f"player_{self.game.current_player}"
+        
+        reward = -1
+        self._cumulative_rewards[self.agent_selection] += reward
+
+        terminated = not self.game.json_object().get("isRunning")
+        if terminated:
+            self.terminations = {agent: True for agent in self.agents}
+            self._add_score()
+
+        self.current_move += 1
+        truncated = self.current_move >= self.max_moves
+
+        if truncated:
+            self.truncations = {agent: True for agent in self.agents}
+            self._add_score()
+
+        # Get valid moves for the next player and store in infos
+        next_valid_moves = self._get_all_valid_moves()
+        self.infos[self.agent_selection] = {"valid_moves": next_valid_moves}
+        
+        return self.state, reward, terminated, truncated, {"valid_moves": next_valid_moves}
+    
+    def observe(self, agent):
+        return self.state
+
+    def render(self):
+        print(self.state)
+        if self.state is None:
+            return
+            
+        # Get tile counts from the state
+        bag_counts = self.state["bag"]
+        lid_counts = self.state["lid"]
+        center_counts = self.state["center"]
+        factories = self.state["factories"]
+        
+        # Use the new renderer
+        self.renderer.render(self.state, bag_counts, lid_counts, center_counts, factories)
+
+    def close(self):
+        self.renderer.close()
 
     @staticmethod
     def __convert_tile_dict_to_array__(tile_dict):
@@ -278,74 +345,7 @@ class AzulEnv(AECEnv):
         else:
             action_tuple = action
         return action_tuple in self._get_all_valid_moves()
-
-    def step(self, action):
-        factory_index, tile_to_take_number, tiles_to_place_floor, pattern_line_index = action
-        tile_to_take = Tile(self.__number_to_tile__(tile_to_take_number))
-
-        # Get valid moves for current player
-        valid_moves = self._get_all_valid_moves()
-        
-        # Check if the action is valid
-        if not self._is_valid_move(action):
-            reward = -2
-            self._cumulative_rewards[self.agent_selection] += reward
-            self.infos[self.agent_selection] = {"valid_moves": valid_moves}
-            return self.state, reward, False, False, {"valid_moves": valid_moves}
-
-        if factory_index == 0:
-            self.game.execute_factory_offer_phase_with_center(
-                tile_to_take, tiles_to_place_floor, pattern_line_index
-            )
-        else:
-            self.game.execute_factory_offer_phase_with_factory(
-                factory_index - 1, tile_to_take, tiles_to_place_floor, pattern_line_index
-            )
-
-        self._set_state()
-        self.agent_selection = f"player_{self.game.current_player}"
-        
-        reward = -1
-        self._cumulative_rewards[self.agent_selection] += reward
-
-        terminated = not self.game.json_object().get("isRunning")
-        if terminated:
-            self.terminations = {agent: True for agent in self.agents}
-            self._add_score()
-
-        self.current_move += 1
-        truncated = self.current_move >= self.max_moves
-
-        if truncated:
-            self.truncations = {agent: True for agent in self.agents}
-            self._add_score()
-
-        # Get valid moves for the next player and store in infos
-        next_valid_moves = self._get_all_valid_moves()
-        self.infos[self.agent_selection] = {"valid_moves": next_valid_moves}
-        
-        return self.state, reward, terminated, truncated, {"valid_moves": next_valid_moves}
     
     def _add_score(self):
         for i, a in enumerate(self.agents):
             self._cumulative_rewards[a] += self.state["players"][i]["score"]
-
-    def observe(self, agent):
-        return self.state
-
-    def render(self):
-        print(self.state)
-        if self.state is None:
-            return
-            
-        # Get tile counts from the state
-        bag_counts = self.state["bag"]
-        lid_counts = self.state["lid"]
-        center_counts = self.state["center"]
-        factories = self.state["factories"]
-        
-        # Use the new renderer
-        self.renderer.render(self.state, bag_counts, lid_counts, center_counts, factories)
-
-    def close(self):
-        self.renderer.close()
