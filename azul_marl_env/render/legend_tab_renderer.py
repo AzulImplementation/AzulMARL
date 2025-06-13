@@ -3,7 +3,7 @@ Legend tab renderer for displaying tile color legend.
 """
 
 import matplotlib.pyplot as plt
-from .base_renderer import BaseRenderer
+from azul_marl_env.render.base_renderer import BaseRenderer
 
 
 class LegendTabRenderer(BaseRenderer):

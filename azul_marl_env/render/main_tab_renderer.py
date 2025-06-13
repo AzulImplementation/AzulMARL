@@ -3,7 +3,7 @@ Main tab renderer for displaying scores, center, and factories.
 """
 
 import matplotlib.pyplot as plt
-from .base_renderer import BaseRenderer
+from azul_marl_env.render.base_renderer import BaseRenderer
 
 
 class MainTabRenderer(BaseRenderer):

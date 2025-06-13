@@ -12,7 +12,7 @@ from azul_game_engine.wall import Wall
 from gymnasium import spaces
 from pettingzoo import AECEnv
 from pettingzoo.utils.agent_selector import agent_selector
-from .render.azul_renderer import AzulRenderer
+from azul_marl_env.render.azul_renderer import AzulRenderer
 
 
 class AzulEnv(AECEnv):

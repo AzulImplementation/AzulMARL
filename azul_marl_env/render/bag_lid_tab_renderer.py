@@ -2,7 +2,7 @@
 Bag and Lid tab renderer for displaying tile counts in bag and lid.
 """
 
-from .base_renderer import BaseRenderer
+from azul_marl_env.render.base_renderer import BaseRenderer
 
 
 class BagLidTabRenderer(BaseRenderer):

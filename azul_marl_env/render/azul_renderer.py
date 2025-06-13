@@ -4,10 +4,10 @@ Main Azul renderer that coordinates all tab renderers and manages the tabbed int
 
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Button
-from .main_tab_renderer import MainTabRenderer
-from .legend_tab_renderer import LegendTabRenderer
-from .bag_lid_tab_renderer import BagLidTabRenderer
-from .player_tab_renderer import PlayerTabRenderer
+from azul_marl_env.render.main_tab_renderer import MainTabRenderer
+from azul_marl_env.render.legend_tab_renderer import LegendTabRenderer
+from azul_marl_env.render.bag_lid_tab_renderer import BagLidTabRenderer
+from azul_marl_env.render.player_tab_renderer import PlayerTabRenderer
 
 
 class AzulRenderer:
