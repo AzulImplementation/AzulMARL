@@ -48,16 +48,25 @@ import random
 env = azul_v1_2players()
 observation, info = env.reset()
 
+# Iterate through agents
 for agent in env.agent_iter():
+    # Get current agent's observation and info
+    observation, reward, termination, truncation, info = env.last()
+    
+    if termination or truncation:
+        break
+        
+    # Get valid moves for current agent
     valid_moves = info["valid_moves"]
+    # Select a random valid move
     action = random.choice(valid_moves)
     # Execute the move
-    observation, reward, terminated, truncated, info = env.step(action)
-    # Render the environment
+    env.step(action)
+    
+    # Render the environment (optional)
     env.render()
-    if terminated or truncated:
-        break
 
+# Close the environment
 env.close()
 ```
 
@@ -72,13 +81,17 @@ def play_random_game():
     observation, info = env.reset()
     
     for agent in env.agent_iter():
-        valid_moves = info["valid_moves"]            
-        action = random.choice(valid_moves)
-        observation, reward, terminated, truncated, info = env.step(action)
+        observation, reward, termination, truncation, info = env.last()
         
-        if terminated or truncated:
+        if termination or truncation:
             print(f"Game finished! Final scores: {[player['score'] for player in observation['players']]}")
             break
+            
+        # Get valid moves and make a random move
+        valid_moves = info["valid_moves"]
+        if valid_moves:
+            action = random.choice(valid_moves)
+            env.step(action)
     
     env.close()
 
@@ -86,11 +99,13 @@ play_random_game()
 ```
 
 ## Environment Details
-    
-    Factory count (num_factories):
-    - 2 player game -> 5
-    - 3 player game -> 7
-    - 4 player game -> 9
+
+```    
+Factory count (num_factories):
+    2 player game -> 5
+    3 player game -> 7
+    4 player game -> 9
+```
 
 - **Action Space**: MultiDiscrete([num_factories + 1, 5, 20, 5])
   - First value: Factory index. Index 0 is taken for the center so the factory indexes are: 0 based factory index + 1.
